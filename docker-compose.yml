@@ -1,0 +1,28 @@
+version: '2'
+services:
+  app:
+    image: nooulaif/rails:latest
+    environment:
+      - RAILS_VERSION=4.2.0
+      - APP_NAME=example
+      - DB_HOST=db
+      - DB_ADAPTER=postgresql
+      - DB_USER=postgres
+    volumes:
+      - ./:/home/app/webapp
+      - bundle_data:/home/app/bundle
+    depends_on:
+      - db
+    ports:
+      - 3000:3000
+  db:
+    image: postgres:9.5
+    volumes:
+      - db_data:/var/lib/postgresql
+    logging:
+      driver: none
+volumes:
+  bundle_data:
+    driver: local
+  db_data:
+    driver: local
