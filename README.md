@@ -34,3 +34,5 @@ Trans people face an epidemic of unemployment. In the U.S., trans people are twi
   - docker-compose run app rake db:reset db:migrate
 
   - docker-compose run app bundle exec rspec
+
+https://medium.com/@charlie.b.ohara/docker-for-rails-developers-5a2a6c2c0593#.3zv2j1fm1
