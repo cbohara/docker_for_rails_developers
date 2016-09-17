@@ -1,4 +1,6 @@
+require 'yaml'
 Rails.application.configure do
+  config.action_mailer.default_url_options = { host: '192.168.99.100', port: 3000 }
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded on
