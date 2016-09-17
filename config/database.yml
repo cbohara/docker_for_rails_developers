@@ -11,6 +11,6 @@ development:
   <<: *default
   host: db
 
-test: &test
+test:
   <<: *default
   host: db
