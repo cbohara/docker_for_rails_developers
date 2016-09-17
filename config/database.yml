@@ -9,6 +9,8 @@ default: &default
 
 development:
   <<: *default
+  host: db
 
 test: &test
   <<: *default
+  host: db
