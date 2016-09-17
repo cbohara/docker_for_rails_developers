@@ -9,7 +9,11 @@ class CompaniesController < ApplicationController
 
   def create
     @company = Company.create(company_params)
-    redirect_to companies_path
+    if @company.valid?
+      redirect_to companies_path
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   private
