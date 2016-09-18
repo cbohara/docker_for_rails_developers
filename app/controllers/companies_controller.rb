@@ -1,6 +1,6 @@
 class CompaniesController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create]
-  
+
   def index
     @companies = Company.all
   end
@@ -15,6 +15,13 @@ class CompaniesController < ApplicationController
       redirect_to companies_path
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def show
+    @company = Company.find_by_id(params[:id])
+    if @company.blank?
+      render text: "Not Found", status: :not_found
     end
   end
 

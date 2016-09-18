@@ -6,4 +6,9 @@ FactoryGirl.define do
     password "secret_password"
     password_confirmation "secret_password"
   end
+
+  factory :company do
+    name "Starbucks"
+    association :user
+  end
 end

@@ -25,7 +25,8 @@ RSpec.describe CompaniesController, type: :controller do
 
   describe "companies#create action" do
     it "should require users to be logged in" do
-      post :create, company: {name: "Starbucks"}
+      company = FactoryGirl.create(:company)
+      post :create, company: {name: company.name}
       expect(response).to redirect_to new_user_session_path
     end
 
@@ -33,7 +34,8 @@ RSpec.describe CompaniesController, type: :controller do
       user = FactoryGirl.create(:user)
       sign_in user
 
-      post :create, company: {name: "Starbucks"}
+      company = FactoryGirl.create(:company)
+      post :create, company: {name: company.name}
       expect(response).to redirect_to companies_path
 
       company = Company.last
@@ -44,9 +46,23 @@ RSpec.describe CompaniesController, type: :controller do
     it "should deal with validation errors" do
       user = FactoryGirl.create(:user)
       sign_in user
+      
       post :create, company: {name: " "}
       expect(response).to have_http_status(:unprocessable_entity)
       expect(Company.count).to eq Company.count
+    end
+  end
+
+  describe "companies#show action" do
+    it "should show the correct company show page based on company id" do
+      company = FactoryGirl.create(:company)
+      get :show, id: company.id
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should return 404 error if company is not found" do
+      get :show, id: 'NOPE'
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
