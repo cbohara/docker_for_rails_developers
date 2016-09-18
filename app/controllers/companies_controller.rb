@@ -1,4 +1,6 @@
 class CompaniesController < ApplicationController
+  before_action :authenticate_user!, only: [:new, :create]
+  
   def index
     @companies = Company.all
   end
@@ -8,7 +10,7 @@ class CompaniesController < ApplicationController
   end
 
   def create
-    @company = Company.create(company_params)
+    @company = current_user.companies.create(company_params)
     if @company.valid?
       redirect_to companies_path
     else
@@ -19,6 +21,6 @@ class CompaniesController < ApplicationController
   private
 
   def company_params
-    params.require(:company).permit(:name)
+    params.require(:company).permit(:name, :user_id)
   end
 end
