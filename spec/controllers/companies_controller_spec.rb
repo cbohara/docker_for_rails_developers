@@ -104,4 +104,21 @@ RSpec.describe CompaniesController, type: :controller do
       expect(company.name).to eq 'Initial'
     end
   end
+
+  describe "companies#destroy action" do
+    it "should allow users to destroy a company" do
+      company = FactoryGirl.create(:company)
+      delete :destroy, id: company.id
+
+      expect(response).to redirect_to companies_path
+
+      search = Company.find_by_id(company.id)
+      expect(search).to eq nil
+    end
+
+    it "should return 404 error if company is not found" do
+      delete :destroy, id: 'NOPE'
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

@@ -41,6 +41,14 @@ class CompaniesController < ApplicationController
     end
   end
 
+  def destroy
+    @company = Company.find_by_id(params[:id])
+    return render_not_found if @company.blank?
+
+    @company.destroy
+    redirect_to companies_path
+  end
+
   private
 
   def company_params
