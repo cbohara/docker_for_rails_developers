@@ -20,14 +20,21 @@ class CompaniesController < ApplicationController
 
   def show
     @company = Company.find_by_id(params[:id])
-    if @company.blank?
-      render text: "Not Found", status: :not_found
-    end
+    return render_not_found if @company.blank?
+  end
+
+  def edit
+    @company = Company.find_by_id(params[:id])
+    return render_not_found if @company.blank?
   end
 
   private
 
   def company_params
     params.require(:company).permit(:name, :user_id)
+  end
+
+  def render_not_found
+    render text: "Not Found", status: :not_found
   end
 end
