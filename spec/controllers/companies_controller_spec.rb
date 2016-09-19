@@ -88,6 +88,15 @@ RSpec.describe CompaniesController, type: :controller do
       get :edit, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
     end
+
+    it "should only allow user who created company post to edit post" do
+      company = FactoryGirl.create(:company)
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      get :edit, id: company.id
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   describe "companies#update action" do
@@ -120,12 +129,21 @@ RSpec.describe CompaniesController, type: :controller do
     it "should check for validation errors" do
       company = FactoryGirl.create(:company, name: 'Initial')
       sign_in company.user
-      
+
       patch :update, id: company.id, company: {name: ' '}
       expect(response).to have_http_status(:unprocessable_entity)
 
       company.reload
       expect(company.name).to eq 'Initial'
+    end
+
+    it "should only allow user who made the company post to update the post" do
+      company = FactoryGirl.create(:company)
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      patch :update, id: company.id, company: {name: company.name}
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -154,6 +172,15 @@ RSpec.describe CompaniesController, type: :controller do
 
       delete :destroy, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
+    end
+
+    it "should only allow the user who created the company post to delete the post" do
+      company = FactoryGirl.create(:company)
+      user = FactoryGirl.create(:user)
+      sign_in user
+
+      delete :destroy, id: company.id
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

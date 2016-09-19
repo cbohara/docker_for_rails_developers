@@ -12,9 +12,9 @@ class CompaniesController < ApplicationController
   def create
     @company = current_user.companies.create(company_params)
     if @company.valid?
-      redirect_to companies_path
+      return redirect_to companies_path
     else
-      render :new, status: :unprocessable_entity
+      return render :new, status: :unprocessable_entity
     end
   end
 
@@ -26,16 +26,18 @@ class CompaniesController < ApplicationController
   def edit
     @company = Company.find_by_id(params[:id])
     return render_not_found if @company.blank?
+    return render_not_found(:forbidden) if @company.user != current_user
   end
 
   def update
     @company = Company.find_by_id(params[:id])
     return render_not_found if @company.blank?
+    return render_not_found(:forbidden) if @company.user != current_user
 
     @company.update_attributes(company_params)
 
     if @company.valid?
-      redirect_to companies_path
+      return redirect_to companies_path
     else
       return render :edit, status: :unprocessable_entity
     end
@@ -44,9 +46,10 @@ class CompaniesController < ApplicationController
   def destroy
     @company = Company.find_by_id(params[:id])
     return render_not_found if @company.blank?
-
+    return render_not_found(:forbidden) if @company.user != current_user
+    
     @company.destroy
-    redirect_to companies_path
+    return redirect_to companies_path
   end
 
   private
@@ -55,7 +58,7 @@ class CompaniesController < ApplicationController
     params.require(:company).permit(:name, :user_id)
   end
 
-  def render_not_found
-    render text: "Not Found", status: :not_found
+  def render_not_found(status=:not_found)
+    render text: "#{status.to_s.titleize}", status: status
   end
 end
