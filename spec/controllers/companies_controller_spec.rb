@@ -67,21 +67,40 @@ RSpec.describe CompaniesController, type: :controller do
   end
 
   describe "companies#edit action" do
+    it "should require users to be logged in" do
+      company = FactoryGirl.create(:company)
+      get :edit, id: company.id
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should successfully show edit form if company is found" do
       company = FactoryGirl.create(:company)
+      sign_in company.user
+
       get :edit, id: company.id
       expect(response).to have_http_status(:success)
     end
 
     it "should return 404 error if company is not found" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
       get :edit, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
     end
   end
 
   describe "companies#update action" do
+    it "should require users to be logged in" do
+      company = FactoryGirl.create(:company)
+      patch :update, id: company.id, company: {name: 'Changed'}
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should allow users to successfully update company info" do
       company = FactoryGirl.create(:company, name: 'Initial')
+      sign_in company.user
+
       patch :update, id: company.id, company: {name: 'Changed'}
       expect(response).to redirect_to companies_path
 
@@ -91,12 +110,17 @@ RSpec.describe CompaniesController, type: :controller do
     end
 
     it "should return 404 error if company is not found" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
       patch :update, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
     end
 
     it "should check for validation errors" do
       company = FactoryGirl.create(:company, name: 'Initial')
+      sign_in company.user
+      
       patch :update, id: company.id, company: {name: ' '}
       expect(response).to have_http_status(:unprocessable_entity)
 
@@ -106,8 +130,16 @@ RSpec.describe CompaniesController, type: :controller do
   end
 
   describe "companies#destroy action" do
+    it "should require users to be logged in" do
+      company = FactoryGirl.create(:company)
+      delete :destroy, id: company.id
+      expect(response).to redirect_to new_user_session_path
+    end
+
     it "should allow users to destroy a company" do
       company = FactoryGirl.create(:company)
+      sign_in company.user
+
       delete :destroy, id: company.id
 
       expect(response).to redirect_to companies_path
@@ -117,6 +149,9 @@ RSpec.describe CompaniesController, type: :controller do
     end
 
     it "should return 404 error if company is not found" do
+      user = FactoryGirl.create(:user)
+      sign_in user
+
       delete :destroy, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
     end
