@@ -4,13 +4,14 @@ default: &default
   pool: 5
   timeout: 5000
   username: postgres
+  host: postgres
   port: 5432
-  host: db
+
 
 development:
   <<: *default
-  host: db
+  host: postgres
 
 test:
   <<: *default
-  host: db
+  host: postgres

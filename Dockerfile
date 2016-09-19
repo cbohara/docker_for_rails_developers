@@ -1,47 +1,61 @@
-FROM ruby:2.3-alpine
+# The base image to use
+# ruby:alpine gives us an alpine-bsed image with ruby installed from source.
+FROM ruby:alpine
 
-# Set all environment variables at once
-ENV GOSU_VERSION=1.9 \
-    GEM_HOME=/home/app/bundle \
-    BUNDLE_PATH=/home/app/bundle \
-    BUNDLE_APP_CONFIG=/home/app/bundle \
-    APP=/home/app/webapp \
-    PATH=/home/app/webapp/bin:/home/app/bundle/bin:$PATH \
-    DB_ADAPTER=sqlite3
+# Install dependencies:
+RUN apk update && apk add --no-cache \
+  autoconf \
+  automake \
+  bzip2 \
+  bzip2-dev \
+  ca-certificates \
+  curl \
+  curl-dev \
+  file \
+  g++ \
+  gcc \
+  geoip-dev \
+  git \
+  glib-dev \
+  imagemagick \
+  jpeg-dev \
+  libc-dev \
+  libevent-dev \
+  libffi-dev \
+  libpng-dev \
+  libpq \
+  libtool \
+  libwebp-dev \
+  libxml2-dev \
+  libxslt-dev \
+  linux-headers \
+  make \
+  nodejs \
+  ncurses-dev \
+  openssl-dev \
+  patch \
+  postgresql-dev \
+  readline-dev \
+  sqlite-dev \
+  xz-dev \
+  yaml-dev \
+  zlib-dev
 
-# Install bash, less, nodejs, db clients and gosu
-# Create app directory and set permissions
-# Remove cache
-RUN apk add --no-cache \
-    bash less nodejs \
-    build-base ruby-dev \
-    libc-dev libffi-dev \
-    sqlite-dev postgresql-dev mysql-dev \
-    libxml2-dev libxslt-dev \
-    tzdata \
-    dpkg gnupg openssl \
- && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
- && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
- && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
- && export GNUPGHOME="$(mktemp -d)" \
- && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
- && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
- && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
- && chmod +x /usr/local/bin/gosu \
- && gosu nobody true \
- && addgroup -g 1000 app \
- && adduser -u 1000 -D -G app -s /bin/bash app \
- && mkdir -p "$APP" "$GEM_HOME/bin" \
- && { \
-    echo 'install: --no-document'; \
-    echo 'update: --no-document'; \
-  } >> /home/app/.gemrc \
- && chown -R app:app /home/app \
- && find / -type f -iname '*.apk-new' -delete \
- && rm -rf '/var/cache/apk/*' '/tmp/*' '/var/tmp/*'
+# Set an environment variable to store where the app is installed to inside
+# of the Docker image.
+ENV INSTALL_PATH /src/app
+RUN mkdir -p $INSTALL_PATH
 
-WORKDIR $APP
-COPY start.sh template.rb entrypoint.sh install_rails.sh /home/app/
+# This sets the context of where commands will be ran in and is documented
+# on Docker's website extensively.
+WORKDIR $INSTALL_PATH
 
-ENTRYPOINT ["/home/app/entrypoint.sh"]
-CMD ["/home/app/start.sh"]
+# Ensure gems are cached and only get updated when they change.
+COPY Gemfile Gemfile
+RUN bundle install
+
+# Copy in the application code from your work station at the current directory
+# over to the working directory.
+COPY . .
+
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
