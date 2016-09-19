@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'simple_form'
 gem 'devise'
-gem 'figaro'
+gem 'httparty', '~> 0.14.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.0'
 # Use postgresql as the database for Active Record
