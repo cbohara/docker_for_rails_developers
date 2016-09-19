@@ -28,6 +28,19 @@ class CompaniesController < ApplicationController
     return render_not_found if @company.blank?
   end
 
+  def update
+    @company = Company.find_by_id(params[:id])
+    return render_not_found if @company.blank?
+
+    @company.update_attributes(company_params)
+
+    if @company.valid?
+      redirect_to companies_path
+    else
+      return render :edit, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def company_params

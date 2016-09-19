@@ -43,7 +43,7 @@ RSpec.describe CompaniesController, type: :controller do
       expect(company.user).to eq(user)
     end
 
-    it "should deal with validation errors" do
+    it "should check for validation errors" do
       user = FactoryGirl.create(:user)
       sign_in user
 
@@ -67,7 +67,7 @@ RSpec.describe CompaniesController, type: :controller do
   end
 
   describe "companies#edit action" do
-    it "should successfully show the edit form if the company is found" do
+    it "should successfully show edit form if company is found" do
       company = FactoryGirl.create(:company)
       get :edit, id: company.id
       expect(response).to have_http_status(:success)
@@ -76,6 +76,32 @@ RSpec.describe CompaniesController, type: :controller do
     it "should return 404 error if company is not found" do
       get :edit, id: 'NOPE'
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "companies#update action" do
+    it "should allow users to successfully update company info" do
+      company = FactoryGirl.create(:company, name: 'Initial')
+      patch :update, id: company.id, company: {name: 'Changed'}
+      expect(response).to redirect_to companies_path
+
+      company.reload
+      expect(company.name).to eq 'Changed'
+
+    end
+
+    it "should return 404 error if company is not found" do
+      patch :update, id: 'NOPE'
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "should check for validation errors" do
+      company = FactoryGirl.create(:company, name: 'Initial')
+      patch :update, id: company.id, company: {name: ' '}
+      expect(response).to have_http_status(:unprocessable_entity)
+
+      company.reload
+      expect(company.name).to eq 'Initial'
     end
   end
 end
