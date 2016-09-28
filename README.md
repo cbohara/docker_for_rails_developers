@@ -4,7 +4,7 @@
 
 https://medium.com/@charlie.b.ohara/docker-for-rails-developers-5a2a6c2c0593#.3zv2j1fm1
 
-### Cheat sheet
+### Cheat sheet:
 
 - build docker image based on Dockerfile
 
